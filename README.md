@@ -32,6 +32,9 @@ Other
 - GUI to simplify the process of calculation
 - Additional features will be implemented in the future
 
+## Motivation
+I was working on my Molecular Dynamics Simulation and I had to calculate the  Lindemann Index from the file. First, I tried to find a functionality in the visualization or post processing software, which turned out to be none. Then, I looked at other software and their features. Eventually realized that there is no Lindemann Index calculator, and since the formula was relatively simple, I ended up making a python script for it. And then I figured it would be cool to create a GUI for it so I tinkered with tkinter. 
+
 ## Citation
 - F.A. Lindemann The Calculcation of Molecular Vibration Frequencies.Phys. Z., 11:609,1910.
 - A. Stukowski. Visualization and analysis of atomistic simulation data with OVITO-the Open Visualization Tool.MODELLING  AND  SIMULATION  IN  MATERIALSSCIENCE AND ENGINEERING, 18(1), January 2010.
