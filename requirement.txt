@@ -1,0 +1,5 @@
+natsort==7.0.1
+numpy==1.18.2
+ovito==3.0.0.dev649
+PySide2==5.14.2
+shiboken2==5.14.2
