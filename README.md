@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 # lindemann.py
 ## Summary
 This is a python code to calculate Lindemann Index using ovito as a pipeline, natsort for list sorting, numpy for computation, and tkinter for GUI.
@@ -36,3 +37,6 @@ Other
 - F.A. Lindemann The Calculcation of Molecular Vibration Frequencies.Phys. Z., 11:609,1910.
 - A. Stukowski. Visualization and analysis of atomistic simulation data with OVITO-the Open Visualization Tool.MODELLING  AND  SIMULATION  IN  MATERIALSSCIENCE AND ENGINEERING, 18(1), January 2010.
 - S. Plimpton. Fast Parallel Algorithms for Short-Range Molecular Dynamics.Journalof Computational Physics, 117(1):1–19, March 1995.
+=======
+
+>>>>>>> 07147ee13fd5231a9cf29b51c9da08811ff814c8
