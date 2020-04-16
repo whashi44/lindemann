@@ -28,13 +28,15 @@ def main():
 
 
 class Application(tk.Frame):
+
+    # -------------------------------------------------------------------------------
     # Constructor
     def __init__(self, master=None):
         # master = root = main window
         super().__init__(master)
         # set master
         self.master = master
-        # Set main window size
+        # Set main window size, and +0+0 indicate the x location and y location
         self.master.geometry("900x1000+0+0")
         # Set window title
         self.master.winfo_toplevel().title("Lindemann Index Calculator")
@@ -43,9 +45,8 @@ class Application(tk.Frame):
         # put all the widget in the designated grid
         self.grid()
 
-
-# Create the widgets (Buttons, Labels, scrollable texts)
-
+# -------------------------------------------------------------------------------
+    # Create the widgets (Buttons, Labels, scrollable texts)
 
     def create_widgets(self):
         # Buttons
@@ -57,11 +58,13 @@ class Application(tk.Frame):
 
         # button to extract number from file name
         self.num_button = Button(self,
+                                 # disabled unless users import file
                                  text="number list",
                                  command=self.get_numlist,
                                  width=15,
                                  state='disabled')
         # Button to compute lindemann index
+        # disabled unless users import file
         self.compute_button = Button(self,
                                      text="compute",
                                      command=self.compute,
@@ -87,7 +90,7 @@ class Application(tk.Frame):
                                   width=20,)
         # state='disabled')
 
-    # Labels
+        # Labels
         # Label for file names
         self.file_label = Label(self,
                                 text="Target Files",
@@ -117,7 +120,7 @@ class Application(tk.Frame):
                                          width=20,
                                          height=10,)
 
-    # Progerss bar
+        # Progerss bar
         # Progress bar max value and length
         self.bar_value = 500
         # Label for progress bar for each individual calculation
@@ -156,8 +159,11 @@ class Application(tk.Frame):
         self.log_text = ScrolledText(self,
                                      width=60,
                                      height=10,)
+        # Autoscroll the scrolled text
+        self.log_text.see('end')
 
-    # Entry
+
+        # Entry
         # Entry for file extension
         self.extension_label = Label(self,
                                      text="file extension:",
@@ -173,25 +179,37 @@ class Application(tk.Frame):
                                   anchor='e',
                                   width="10",)
         self.prefix_entry = Entry(self)
-        # default text value for the prefix is "", hence no need to deifne
+        # default text value for the prefix is "", hence no need to redefine
 
-    # file explorer
+        # file explorer
         # label for current working directory
         self.cwd_label = Label(self,
-                               text='Directory:',
+                               text='Directory Name:',
                                anchor='e',
                                width='10',)
 
         # entry for current working directory
         self.cwd_entry = Entry(self)
         self.cwd_entry.insert('end', os.getcwd())
-        # button for opening file explorer
+        # button for opening file explorer to
         self.cwd_button = Button(self,
-                                  text="get",
-                                  command=self.browse_files,
+                                 text="Browse",
+                                 command=self.browse_folder,
+                                 width=15,)
+
+        # button for saving the content to a file
+        self.save_button = Button(self,
+                                  text="Save to file",
+                                  command=self.save,
                                   width=15,)
 
-    # Placement
+        # check box for choosing to use num_list for graphing or not
+        self.chk_state = tk.BooleanVar()
+        self.chk_state.set(False)
+        self.numlist_check = Checkbutton(self, text="Use numbers list as x-axis", var=self.chk_state)
+
+
+        # Placement
         # Placement of those buttons
         self.file_button.grid(column=0, row=0, sticky="we",)
         self.num_button.grid(column=1, row=0, sticky="we",)
@@ -231,12 +249,16 @@ class Application(tk.Frame):
 
         # Placement of cwd
         self.cwd_label.grid(column=0, row=11, sticky="we",)
-        self.cwd_entry.grid(column=1, row=11, sticky="we",)
-        self.cwd_button.grid(column=2, row=11, sticky="we",)
+        self.cwd_entry.grid(column=1, row=11, columnspan=2, sticky="we",)
+        self.cwd_button.grid(column=3, row=11, sticky="we",)
+
+        # Placement of save button
+        self.save_button.grid(column=0, row=12, sticky="we",)
+
+        # Placement of Checkbutton
+        self.numlist_check.grid(column=0, row=13, sticky="we",)
 
         #
-        # self.chk_state = tk.BooleanVar()
-        # self.chk_state.set(False)
         # self.chk = Checkbutton(self, text="Test", var=self.chk_state)
         # self.chk.grid(column=0, row=6)
         #
@@ -247,13 +269,17 @@ class Application(tk.Frame):
         # self.rad2.grid(column=1,row=7)
         # self.rad3.grid(column=2,row=7)
 
-# Get the list of file from the directories with specified file extension
+# -------------------------------------------------------------------------------
+# Change the state of button to a given state (on or off)
 
     def change_state(self, button, state):
         if state == 'on':
             button['state'] = 'normal'
         elif state == 'off':
             button['state'] = 'disabled'
+
+# -------------------------------------------------------------------------------
+# Get the list of file from the directories with specified file extension
 
     def get_filelist(self, file_prefix=""):
         # Turn off the file button to so user don't click until cleared
@@ -283,6 +309,7 @@ class Application(tk.Frame):
                 tk.INSERT, f'Using "{file_prefix}" as target file extension.\n')
         # First, get all the directories
         all_directory = os.listdir()
+
         # Extract only the one that is file, and file extension and file prefix(if given)
         for file in all_directory:
             if osp.isfile(file) and file.endswith(file_extension) and file.startswith(file_prefix):
@@ -307,7 +334,9 @@ class Application(tk.Frame):
         self.change_state(self.num_button, 'on')
         self.change_state(self.compute_button, 'on')
 
+# -------------------------------------------------------------------------------
 # Get the number from file name (Ex. nano3_573K.lammpstrj, then get 573)
+
     def get_numlist(self):
         # Turn off num button so user do not click again
         self.change_state(self.num_button, 'off')
@@ -321,26 +350,27 @@ class Application(tk.Frame):
         # iterate each file
         for file in self.file_list:
             # Regular expression to find the number from files
-            # slicing([1:-1]) is used because the result is nested list,
-            # and the [] and '' are not needed when outputting
-            number = str(re.findall(r'\d+', file))[1:-1]
+            # Since the findall return the list, it is necessary to obtain the 0th element
+            # The result is string, so convert it to int
+            number = int(re.findall(r'\d+', file)[0])
+            self.num_text.insert(tk.INSERT, f'{number}\n')
             self.num_list.append(number)
         # sort the list
-        self.num_list = nt.natsorted(self.num_list)
+        # self.num_list = nt.natsorted(self.num_list)
 
-        # log the file that is
+        # log
         self.log_text.insert(
-            tk.INSERT, 'Found the lists of numbers')
+            tk.INSERT, 'Extracted the numbers from the file name')
         # Slicing again to remove the another [] and '' symbol
         # Then output to the scrolled text box
-        for number in self.num_list:
-            number = str(number)[1:-1]
-            self.num_text.insert(tk.INSERT, f'{number}\n')
+        # for number in self.num_list:
+        #     number = str(number)[1:-1]
 
-        # log the file that is
-        self.log_text.insert(tk.INSERT, '......outputted.\n')
 
+
+# -------------------------------------------------------------------------------
     # Resetting the window
+
     def clear(self):
         # Reset the scrolled text by deleting the content
         self.file_text.delete("1.0", "end")
@@ -358,9 +388,12 @@ class Application(tk.Frame):
         self.change_state(self.num_button, 'off')
         self.change_state(self.compute_button, 'off')
         self.change_state(self.quit_button, 'on')
+        self.change_state(self.plot_button, 'off')
 
+# -------------------------------------------------------------------------------
     # Save the value to a file
-    def save_value(self, file_name='Lindemann.txt'):
+
+    def save(self, file_name='lindemann.txt'):
 
         with open(file_name, 'w') as write_file:
             write_file.write('Lindemann Index is \n')
@@ -370,25 +403,41 @@ class Application(tk.Frame):
                 output = '{}\n'.format(LI)
                 write_file.write(f"{file}:{LI} \n")
 
+# -------------------------------------------------------------------------------
     # Plot the result: Lindemann index vs temperature
     def plot(self):
         figure = plt.Figure()
         ax1 = figure.add_subplot(111)
         scatter1 = FigureCanvasTkAgg(figure, self)
-        ax1.plot(self.lindemann_index_cluster)
+        if chk_state:
+            ax1.plot(self.num_list, self.lindemann_index_cluster)
+        else:
+            ax1.plot(self.lindemann_index_cluster)
         # scatter1.show()
         scatter1.get_tk_widget().grid(column=0, row=11, columnspan=6, sticky="we",)
 
-    def browse_files(self):
+# -------------------------------------------------------------------------------
+    # Prompt user to open file directory
+    def browse_folder(self):
+
         # self.filename = filedialog.askopenfilename(initialdir = "/",
         # title = "Select a File",
         # filetypes = (("Text files", "*.txt*"),("all files", "*.*")),)
+
+        # Obtaint the file path
         self.filepath = filedialog.askdirectory()
-        self.cwd_entry.insert('end', self.filepath)
+        # If user did not cancel the dialog
+        if self.filepath:
+            # Clear the entry
+            self.cwd_entry.delete(0, "end")
+            # insert the new file path
+            self.cwd_entry.insert('end', self.filepath)
+            # Change the directory to a specified path
+            os.chdir(self.filepath)
 
-
-
+# -------------------------------------------------------------------------------
     # Calculating the Lindemann Index
+
     def compute(self):
         # Turn off compute button so user do not compute again
         self.change_state(self.compute_button, 'off')
@@ -428,33 +477,41 @@ class Application(tk.Frame):
             distance_square_average = np.zeros((num_distance, num_distance))
             position = np.zeros(((num_particle, 3, num_frame)))
             # Store particle position into a single matrix
+            # The matrix dimension is as follows:
+            # 1st: The coordinates position, i.e. 1.0, 3.0, 4.0
+            # 2nd: The coordiante axis: i.e. x, y or z
+            # 3rd: The time axis: i.e. timestep 0, timestep 1,....
             for frame in range(num_frame):
                 data = pipeline.compute(frame)
                 position[:, :, frame] = np.array(data.particles['Position'])
-            # Calculate the difference between each consecutive atom for later usage
-            # Example: diff will calculate atom1-2, atom2-3,atom3-4, and so on
-            difference = np.diff(position, axis=0)  # position axis = 0
 
-            #   LI calculation
+            # Calculate the difference between each consecutive atom for later usage
+            # Example: diff will calculate the difference between
+            # atom1-2, atom2-3,atom3-4, and so on
+            position_axis = 0
+            difference = np.diff(position, axis=position_axis)
+
+            #   Lindemann index calculation
+            # for each individual atom, starting from 0,
+            # k increment every time, because the calculation will be performed for
+            # Atom 1-2, 1-3, ....1-n, and then 2-3, 2-4,.....2-n and so on
             for k in range(num_distance):
-                # position axis = 0, xyz axis = 1, time axis = 2.
-                position_axis = 0
                 xyz_axis = 1
                 time_axis = 2
-                # cumsum to obtain cumulative sum of the differences
+                # cumsum to obtain the cumulative sum of the differences
                 # if the number is 1, 2, 3, 4
                 # Cumsum will give 1, 3, 6, 10
-                # Adding 1-2, 2-3, will give 1-3
-                # Adding 1,2, 2-3, 3-4, will give 1-4
+                # Adding 1-2, 2-3, will give 1-2, 1-3
+                # Adding 1,2, 2-3, 3-4, will give 1-2, 1-3, 1-4
                 # atom1-2, atom1-3, atom1-4, atom1-5 and so on
                 xyz = np.cumsum(difference[k:, :, :], axis=position_axis)
                 # Square each and sum up and take sqrt based on distance formula
                 distance = np.sqrt(np.sum(xyz**2, xyz_axis))
                 # due to the sum function, now the time axis = 1 and coordinate axis disappear
                 time_axis = 1
-                # Take the time average
+                # Take the time-average
                 distance_average[k:, k] = np.mean(distance, axis=time_axis)
-                # Take the squared time average
+                # Take the time-average of the squared distance
                 distance_square_average[k:, k] = np.mean(
                     distance**2, axis=time_axis)
                 # For progress bar for each computation
@@ -464,16 +521,17 @@ class Application(tk.Frame):
 
             # Calculate the coefficient
             coefficient = 2 / ((num_particle) * (num_particle - 1))
-            # Square the time-averaged distance
+            # Take the square of time-averaged distance
             distance_average_square = distance_average[:]**2
             # supprsessing 0 division error warning
             with np.errstate(divide='ignore', invalid='ignore'):
                 lindemann_index_individual = np.sqrt(
                     distance_square_average - distance_average_square) / distance_average
             # Since half of the matrix is division by 0, there will be NaN
-            # Hence conversion to 0 is necessary.
+            # Hence conversion from NaN to 0 is necessary.
             lindemann_index_individual = np.nan_to_num(
                 lindemann_index_individual[:])
+            # Sum up all the individual lindeman index to obtain lindemann index cluster
             # Store the final value into matrix so we can obtain all at once later
             self.lindemann_index_cluster[count] = coefficient * \
                 np.sum(lindemann_index_individual)
@@ -485,10 +543,7 @@ class Application(tk.Frame):
             self.compute_text.insert(
                 tk.INSERT, f'{self.lindemann_index_cluster[count]}\n')
             # logging elapsed time
-            self.log_text.insert(
-                tk.INSERT, f"Elapsed time: {calc_time}\n\n")
-            # Autoscroll the scrolled bar
-            self.log_text.see('end')
+            self.log_text.insert(tk.INSERT, f"Elapsed time: {calc_time}\n\n")
             # Update the progress bar for file progress
             self.filebar['value'] = self.filebar['value'] + \
                 self.bar_value / len(self.file_list)
@@ -496,7 +551,9 @@ class Application(tk.Frame):
 
         # Turn on quit button since the computation is done
         self.change_state(self.quit_button, 'on')
+        self.change_state(self.plot_button, 'on')
 
 
+# The ushe
 if __name__ == '__main__':
     main()
