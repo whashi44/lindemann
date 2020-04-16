@@ -42,13 +42,15 @@ class Application(tk.Frame):
         self.master.winfo_toplevel().title("Lindemann Index Calculator")
         # Create all the widgets()
         self.create_widgets()
+
         # put all the widget in the designated grid
-        self.grid()
+        self.pack()
 
 # -------------------------------------------------------------------------------
     # Create the widgets (Buttons, Labels, scrollable texts)
 
     def create_widgets(self):
+
         # Buttons
         # Button to import files
         self.file_button = Button(self,
@@ -87,10 +89,11 @@ class Application(tk.Frame):
         self.plot_button = Button(self,
                                   text="Plot",
                                   command=self.plot,
+                                  state='disabled',
                                   width=20,)
         # state='disabled')
 
-        # Labels
+        ## Labels
         # Label for file names
         self.file_label = Label(self,
                                 text="Target Files",
@@ -120,7 +123,7 @@ class Application(tk.Frame):
                                          width=20,
                                          height=10,)
 
-        # Progerss bar
+        ## Progerss bar
         # Progress bar max value and length
         self.bar_value = 500
         # Label for progress bar for each individual calculation
@@ -159,8 +162,6 @@ class Application(tk.Frame):
         self.log_text = ScrolledText(self,
                                      width=60,
                                      height=10,)
-        # Autoscroll the scrolled text
-        self.log_text.see('end')
 
 
         # Entry
@@ -345,7 +346,7 @@ class Application(tk.Frame):
         self.num_list = []
         # Log the file extension to the GUI
         self.log_text.insert(
-            tk.INSERT, '\nFinding the list of numbers associated to the file name......\n')
+            tk.INSERT, '\nExtracting of numbers from the list of file names......\n')
 
         # iterate each file
         for file in self.file_list:
@@ -353,10 +354,9 @@ class Application(tk.Frame):
             # Since the findall return the list, it is necessary to obtain the 0th element
             # The result is string, so convert it to int
             number = int(re.findall(r'\d+', file)[0])
-            self.num_text.insert(tk.INSERT, f'{number}\n')
             self.num_list.append(number)
-        # sort the list
-        # self.num_list = nt.natsorted(self.num_list)
+            # log to the scrolled text
+            self.num_text.insert(tk.INSERT, f'{number}\n')
 
         # log
         self.log_text.insert(
@@ -393,15 +393,24 @@ class Application(tk.Frame):
 # -------------------------------------------------------------------------------
     # Save the value to a file
 
-    def save(self, file_name='lindemann.txt'):
+    def save(self):
+        # file types for the dialog
+        files = [('All Files', '*.*'), ('Text Files', '*.txt')]
+        # return file name. If canceled, return blank string
+        file_name = filedialog.asksaveasfilename(initialdir = self.filepath, filetypes=files,defaultextension='*.txt', initialfile="lindemann.txt")
+        # check for user cancel
+        if file_name != "":
+            # open the text file
+            with open(file_name, 'w') as write_file:
+                # iterate through file name from file list
+                for count, file in enumerate(self.file_list):
+                    # too long for the f string, so store in temp variable
+                    LI = self.lindemann_index_cluster[count]
+                    # output = '{}\n'.format(LI)
+                    write_file.write(f"{file}:{LI} \n")
 
-        with open(file_name, 'w') as write_file:
-            write_file.write('Lindemann Index is \n')
-        for count, file in enumerate(self.file_list):
-            with open('Lindemann.txt', 'a+') as write_file:
-                LI = np.array2string(self.lindemann_index_cluster[count])
-                output = '{}\n'.format(LI)
-                write_file.write(f"{file}:{LI} \n")
+        self.log_text.insert(
+            tk.INSERT, f'Lindemann index value was save to the file: {file_name}')
 
 # -------------------------------------------------------------------------------
     # Plot the result: Lindemann index vs temperature
@@ -409,7 +418,7 @@ class Application(tk.Frame):
         figure = plt.Figure()
         ax1 = figure.add_subplot(111)
         scatter1 = FigureCanvasTkAgg(figure, self)
-        if chk_state:
+        if self.chk_state:
             ax1.plot(self.num_list, self.lindemann_index_cluster)
         else:
             ax1.plot(self.lindemann_index_cluster)
@@ -548,6 +557,9 @@ class Application(tk.Frame):
             self.filebar['value'] = self.filebar['value'] + \
                 self.bar_value / len(self.file_list)
             self.update_idletasks()
+
+            # Autoscroll the scrolled text
+            self.log_text.see('end')
 
         # Turn on quit button since the computation is done
         self.change_state(self.quit_button, 'on')
