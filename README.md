@@ -2,6 +2,11 @@
 ## Summary
 This is a python code to calculate Lindemann Index using ovito as a pipeline, natsort for list sorting, numpy for computation, and tkinter for GUI.
 
+<img src="lindemann.gif" alt="GUI for lindemann Index">
+
+## Motivation
+I was working on my Molecular Dynamics Simulation and I had to calculate the  Lindemann Index from the file. First, I tried to find a functionality in the visualization or post processing software, which turned out to be none. Then, I looked at other software and their features. Eventually realized that there is no Lindemann Index calculator, and since the formula was relatively simple, I ended up making a python script for it. And then I figured it would be cool to create a GUI for it so I tinkered with tkinter. 
+
 ## Theory
 The Lindemann index is defined as the root-mean-square bond-length fluctuation with following mathematical expression:
 
@@ -35,8 +40,6 @@ Other
 - saving the lindemann index into a txt file for future usage
 - Additional features will be implemented in the future
 
-## Motivation
-I was working on my Molecular Dynamics Simulation and I had to calculate the  Lindemann Index from the file. First, I tried to find a functionality in the visualization or post processing software, which turned out to be none. Then, I looked at other software and their features. Eventually realized that there is no Lindemann Index calculator, and since the formula was relatively simple, I ended up making a python script for it. And then I figured it would be cool to create a GUI for it so I tinkered with tkinter. 
 
 ## Citation
 - F.A. Lindemann The Calculcation of Molecular Vibration Frequencies.Phys. Z., 11:609,1910.

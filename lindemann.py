@@ -47,7 +47,8 @@ class Application(tk.Frame):
         self.master.winfo_toplevel().title("Lindemann Index Calculator")
         # Create all the widgets()
         self.create_widgets()
-
+        # Initialize tha path
+        self.filepath = os.getcwd()
         # put all the widget in the designated grid
         self.pack()
 
@@ -175,7 +176,7 @@ class Application(tk.Frame):
 
         # button for saving the content to a file
         self.save_button = Button(
-            self, text="Save to file", command=self.save, width=15,
+            self, text="Save to file", command=self.save, width=15, state='disabled'
         )
         # --------Check button---------
         # check button for choosing to use num_list for graphing or not
@@ -312,14 +313,14 @@ class Application(tk.Frame):
     # Change the state of button to a given state (on or off)
 
     def change_state(self, button, state):
-        """Change the state of button to a given state 
-        
+        """Change the state of button to a given state
+
         Args:
             button (object): button object that needs change in state
             state (string): "on" or "off"
 
-        Example 
-        change_state(self.button, "on") 
+        Example
+        change_state(self.button, "on")
         will turn on the self.button
         """
         if state == "on":
@@ -390,9 +391,9 @@ class Application(tk.Frame):
     # Get the number from file name (Ex. nano3_573K.lammpstrj, then get 573)
 
     def get_numlist(self):
-        """Extract the number from file name 
+        """Extract the number from file name
         Ex. if the file name is prod_573K.lammpstrj,
-        This function will extract 573 and append to num_list        
+        This function will extract 573 and append to num_list
         """
         # Turn off num button so user do not click again
         self.change_state(self.num_button, "off")
@@ -434,15 +435,17 @@ class Application(tk.Frame):
 
         # Change the button state
         self.change_state(self.file_button, "on")
+        self.change_state(self.quit_button, "on")
         self.change_state(self.num_button, "off")
         self.change_state(self.compute_button, "off")
-        self.change_state(self.quit_button, "on")
+        self.change_state(self.save_button, "off")
         self.change_state(self.plot_button, "off")
+
 
     # -------------------------------------------------------------------------------
     def save(self):
         """Save the value to a file
-        It will prompt user a directory to save a file 
+        It will prompt user a directory to save a file
         The default file format it txt file
         """
         # file types for the dialog
@@ -465,15 +468,19 @@ class Application(tk.Frame):
                     # output = '{}\n'.format(LI)
                     write_file.write(f"{file}:{LI} \n")
 
-        # log
-        self.log_text.insert(
-            tk.INSERT, f"Lindemann index value was save to the file: {file_name}"
-        )
+            # log
+            self.log_text.insert(
+                tk.INSERT, f"Lindemann index value was save to the file: {file_name}\n"
+            )
+        else:
+            self.log_text.insert(
+                tk.INSERT, "File save cancelled\n"
+            )
 
     # -------------------------------------------------------------------------------
     def plot(self):
         """Plot the result
-        If the check button was pressed, then the lindemann index vs. num_list will be plot 
+        If the check button was pressed, then the lindemann index vs. num_list will be plot
         If the check was not pressed, then the lindemann index will be plotted against some consecutive numbers
         """
         figure = plt.Figure()
@@ -493,9 +500,10 @@ class Application(tk.Frame):
         """ Prompt user to open a directory and change the current directory to that folder
         """
         # Obtaint the file path
-        self.filepath = filedialog.askdirectory()
+        temp_path = filedialog.askdirectory(initialdir=self.filepath)
         # If user did not cancel the dialog
-        if self.filepath:
+        if temp_path:
+            self.filepath = temp_path
             # Clear the entry
             self.cwd_entry.delete(0, "end")
             # insert the new file path
@@ -503,13 +511,17 @@ class Application(tk.Frame):
             # Change the directory to a specified path
             os.chdir(self.filepath)
 
-        # log
-        self.log_text.insert(tk.INSERT, f"Changed the directory to {self.filepath}")
+            # log
+            self.log_text.insert(tk.INSERT, f"Changed the directory to {self.filepath}\n")
+        else:
+            # log
+            self.log_text.insert(tk.INSERT, "Cancelled directory change\n")
+
 
     # -------------------------------------------------------------------------------
 
     def compute(self):
-        """Calculate the lindemann index 
+        """Calculate the lindemann index
         """
         # Turn off compute button so user do not compute again
         self.change_state(self.compute_button, "off")
@@ -521,10 +533,6 @@ class Application(tk.Frame):
         for count, file in enumerate(self.file_list):
             # Initializing the each compute brogress bar
             self.compute_bar["value"] = 0
-            # Initializign the file count
-            self.filecount_label[
-                "text"
-            ] = f"file count: {count+1}/{len(self.file_list)}"
             self.update_idletasks()
             # logging to scrolled text
             self.log_text.insert(
@@ -627,14 +635,21 @@ class Application(tk.Frame):
             self.filebar["value"] = self.filebar["value"] + self.bar_value / len(
                 self.file_list
             )
+            # Update the file count
+            self.filecount_label[
+                "text"
+            ] = f"file count: {count+1}/{len(self.file_list)}"
             self.update_idletasks()
 
             # Autoscroll the scrolled text
             self.log_text.see("end")
+            self.compute_text.see("end")
+
 
         # Turn on quit button since the computation is done
         self.change_state(self.quit_button, "on")
         self.change_state(self.plot_button, "on")
+        self.change_state(self.save_button, "on")
 
 
 if __name__ == "__main__":
