@@ -24,12 +24,15 @@ Other
 
 
 ## Feature
-- Load all the dump file with specified file extension
+- Batch computing 
 - Obtain atom coordinates from ovito pipeline
-- Perform computation using numpy with matrix operation to improve calculation speed
-- Progress bar to indicate the progress
-- File name extraction using regular expression to obtain temperature value form file name if the file name is set up accordingly.
-- GUI to simplify the process of calculation
+- Perform computation using numpy 
+- Vectorizatoin to optimizae the computation speed
+- Progress bar for easy to understand progress
+- File name extraction using regular expression to obtain temperature value form file name (proper set up for file name is required)
+- GUI to simplify the use
+- matplotlib integration for basic plotting
+- saving the lindemann index into a txt file for future usage
 - Additional features will be implemented in the future
 
 ## Motivation
