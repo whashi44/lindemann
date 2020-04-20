@@ -1,10 +1,18 @@
 # standard library
 import tkinter as tk
 from tkinter.ttk import Progressbar
-from tkinter import Button, Label, Checkbutton, Entry, filedialog, Radiobutton
+from tkinter import (
+    Button,
+    Label,
+    Checkbutton,
+    Entry,
+    filedialog,
+    Radiobutton,
+    Scrollbar,
+)
 from tkinter.scrolledtext import ScrolledText
 import os
-import os.path as osp
+from os.path import isfile
 import sys
 import re
 import time
@@ -21,12 +29,17 @@ from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 
 
 def main():
+    # Create root window
     root = tk.Tk()
+    # Create instance with root as the master window
     app = Application(master=root)
+    # An infinite loop used to run the application
     app.mainloop()
 
 
 # Main page inheriting from tk.Frame
+# Frame is the container for other widgets
+# Majority of the OO struture was referenced from http://zetcode.com/tkinter/introduction/
 
 
 class Application(tk.Frame):
@@ -38,10 +51,11 @@ class Application(tk.Frame):
         """Constructor to initialize
         """
         # master = root = main window
+        # __init__ call the constructor from the Frame class
         super().__init__(master)
-        # set master
+        # set master, the root window
         self.master = master
-        # Set main window size, and +0+0 indicate the x location and y location
+        # Set root window size, +0+0 indicate the initial x and y location
         self.master.geometry("900x1000+0+0")
         # Set window title
         self.master.winfo_toplevel().title("Lindemann Index Calculator")
@@ -176,7 +190,7 @@ class Application(tk.Frame):
 
         # button for saving the content to a file
         self.save_button = Button(
-            self, text="Save to file", command=self.save, width=15, state='disabled'
+            self, text="Save to file", command=self.save, width=15, state="disabled"
         )
         # --------Check button---------
         # check button for choosing to use num_list for graphing or not
@@ -216,6 +230,16 @@ class Application(tk.Frame):
         )
         self.clear_button.grid(
             column=0, row=5, sticky="we",
+        )
+
+        # Plot button
+        self.plot_button.grid(
+            column=1, row=5, sticky="we",
+        )
+
+        # Placement of save button
+        self.save_button.grid(
+            column=2, row=5, sticky="we",
         )
 
         # Labels
@@ -279,11 +303,6 @@ class Application(tk.Frame):
             column=1, row=9, sticky="we",
         )
 
-        # Plot button
-        self.plot_button.grid(
-            column=0, row=10, sticky="we",
-        )
-
         # Placement of open directory
         self.cwd_label.grid(
             column=0, row=11, sticky="we",
@@ -295,19 +314,14 @@ class Application(tk.Frame):
             column=3, row=11, sticky="we",
         )
 
-        # Placement of save button
-        self.save_button.grid(
-            column=0, row=12, sticky="we",
-        )
-
         # Placement of Checkbutton
         self.numlist_check.grid(
-            column=0, row=13, sticky="we",
+            column=0, row=14, sticky="we",
         )
 
         # Placement of Radio button
-        self.batch.grid(column=0, row=14)
-        self.single.grid(column=1, row=14)
+        self.batch.grid(column=1, row=14)
+        self.single.grid(column=2, row=14)
 
     # -------------------------------------------------------------------------------
     # Change the state of button to a given state (on or off)
@@ -364,7 +378,7 @@ class Application(tk.Frame):
         # Extract only the one that is file, and file extension and file prefix(if given)
         for file in all_directory:
             if (
-                osp.isfile(file)
+                isfile(file)
                 and file.endswith(file_extension)
                 and file.startswith(file_prefix)
             ):
@@ -441,7 +455,6 @@ class Application(tk.Frame):
         self.change_state(self.save_button, "off")
         self.change_state(self.plot_button, "off")
 
-
     # -------------------------------------------------------------------------------
     def save(self):
         """Save the value to a file
@@ -473,27 +486,40 @@ class Application(tk.Frame):
                 tk.INSERT, f"Lindemann index value was save to the file: {file_name}\n"
             )
         else:
-            self.log_text.insert(
-                tk.INSERT, "File save cancelled\n"
-            )
+            self.log_text.insert(tk.INSERT, "File save cancelled\n")
 
     # -------------------------------------------------------------------------------
     def plot(self):
-        """Plot the result
+        """Plot the result to a new window
         If the check button was pressed, then the lindemann index vs. num_list will be plot
         If the check was not pressed, then the lindemann index will be plotted against some consecutive numbers
         """
+        self.log_text.insert(
+            tk.INSERT, "\n Plotting the result to the new Window......\n"
+        )
+
+        # Create a new window
+        newWindow = tk.Toplevel()
+        # Create a figure
         figure = plt.Figure()
         ax1 = figure.add_subplot(111)
-        scatter1 = FigureCanvasTkAgg(figure, self)
-        if self.chk_state:
+        ax1.set_ylabel("Lindemann Index")
+        scatter1 = FigureCanvasTkAgg(figure, newWindow)
+
+        # Checking the state, get() is required because it is a tkinter boolean.
+        if self.chk_state.get():
             ax1.plot(self.num_list, self.lindemann_index_cluster)
+            ax1.set_xlabel("Temperature")
         else:
             ax1.plot(self.lindemann_index_cluster)
-        # scatter1.show()
-        scatter1.get_tk_widget().grid(
-            column=0, row=11, columnspan=6, sticky="we",
-        )
+            ax1.set_xlabel("constant")
+
+        # scatter1.get_tk_widget().grid(
+        #     column=0, row=11, columnspan=6, sticky="we",
+        # )
+
+        # Display the graph to the tkinter
+        scatter1.get_tk_widget().pack()
 
     # -------------------------------------------------------------------------------
     def browse_folder(self):
@@ -512,11 +538,12 @@ class Application(tk.Frame):
             os.chdir(self.filepath)
 
             # log
-            self.log_text.insert(tk.INSERT, f"Changed the directory to {self.filepath}\n")
+            self.log_text.insert(
+                tk.INSERT, f"Changed the directory to {self.filepath}\n"
+            )
         else:
             # log
             self.log_text.insert(tk.INSERT, "Cancelled directory change\n")
-
 
     # -------------------------------------------------------------------------------
 
@@ -644,7 +671,6 @@ class Application(tk.Frame):
             # Autoscroll the scrolled text
             self.log_text.see("end")
             self.compute_text.see("end")
-
 
         # Turn on quit button since the computation is done
         self.change_state(self.quit_button, "on")
