@@ -567,8 +567,7 @@ class Application(tk.Frame):
             )
 
             # tracking elapsed time
-            t_start = time.time()
-
+            t_start = time.time() 
             # Importing the files
             pipeline = import_file(file, sort_particles=True)
             num_frame = pipeline.source.num_frames
@@ -580,7 +579,7 @@ class Application(tk.Frame):
             )
             data = pipeline.compute()
 
-            #   Initilizations
+            #   Initializations
             num_particle = data.particles.count
             num_distance = num_particle - 1
             distance = np.zeros((num_distance, num_frame))
@@ -590,7 +589,7 @@ class Application(tk.Frame):
             # Store particle position into a single matrix
             # The matrix dimension is as follows:
             # 1st: The coordinates position, i.e. 1.0, 3.0, 4.0
-            # 2nd: The coordiante axis: i.e. x, y or z
+            # 2nd: The coordinate axis: i.e. x, y or z
             # 3rd: The time axis: i.e. timestep 0, timestep 1,....
             for frame in range(num_frame):
                 data = pipeline.compute(frame)
@@ -643,7 +642,7 @@ class Application(tk.Frame):
             # Since half of the matrix is division by 0, there will be NaN
             # Hence conversion from NaN to 0 is necessary.
             lindemann_index_individual = np.nan_to_num(lindemann_index_individual[:])
-            # Sum up all the individual lindeman index to obtain lindemann index cluster
+            # Sum up all the individual Lindemann index to obtain lindemann index cluster
             # Store the final value into matrix so we can obtain all at once later
             self.lindemann_index_cluster[count] = coefficient * np.sum(
                 lindemann_index_individual
