@@ -32,6 +32,7 @@ def main():
     # Create root window
     root = tk.Tk()
     # Create instance with root as the master window
+    # lindemann = Lindemann()
     app = Application(master=root)
     # An infinite loop used to run the application
     app.mainloop()
@@ -40,6 +41,9 @@ def main():
 # Main page inheriting from tk.Frame
 # Frame is the container for other widgets
 # Majority of the OO struture was referenced from http://zetcode.com/tkinter/introduction/
+# class Lindemann:
+#     def __init__(self):
+#         print("This is lindemann")
 
 
 class Application(tk.Frame):
@@ -47,13 +51,17 @@ class Application(tk.Frame):
     """
 
     # -------------------------------------------------------------------------------
-    def __init__(self, master=None):
+    def __init__(self, master=None, calc=None):
         """Constructor to initialize
         """
+        # # import lindemann class
+        # self.lindemann = calc
+
         # master = root = main window
         # __init__ call the constructor from the Frame class
         super().__init__(master)
         # set master, the root window
+
         self.master = master
         # Set root window size, +0+0 indicate the initial x and y location
         self.master.geometry("900x1000+0+0")
@@ -356,8 +364,6 @@ class Application(tk.Frame):
         # grab file_prefix from the entry
         file_prefix = self.prefix_entry.get()
 
-        # initialize file list
-        self.file_list = []
         # Log the current file extension to the GUI
         if file_extension == "":
             self.log_text.insert(tk.INSERT, "No file extension was selected.\n")
@@ -372,6 +378,10 @@ class Application(tk.Frame):
             self.log_text.insert(
                 tk.INSERT, f'Using "{file_prefix}" as target file prefix.\n'
             )
+
+        # initialize file list
+        self.file_list = []
+
         # First, get all the directories
         all_directory = os.listdir()
 
