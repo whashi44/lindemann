@@ -104,7 +104,8 @@ class Application(tk.Frame):
             self, text="QUIT", fg="red", command=self.quit, width=20,
         )
         # Button to reset the window
-        self.clear_button = Button(self, text="Clear", command=self.clear, width=20,)
+        self.clear_button = Button(
+            self, text="Clear", command=self.clear, width=20,)
 
         # Button for plotting
         self.plot_button = Button(
@@ -134,7 +135,8 @@ class Application(tk.Frame):
         # Progress bar max value and length
         self.bar_value = 500
         # Label for progress bar for each individual calculation
-        self.bar_label = Label(self, text="Computation Progress", anchor="e", width=20,)
+        self.bar_label = Label(
+            self, text="Computation Progress", anchor="e", width=20,)
 
         # Progress bar for each lindemann index calculation progress
         self.compute_bar = Progressbar(
@@ -146,7 +148,8 @@ class Application(tk.Frame):
         )
 
         # Label for Progress bar for each file progress
-        self.filebar_label = Label(self, text="File Progress", anchor="e", width=20,)
+        self.filebar_label = Label(
+            self, text="File Progress", anchor="e", width=20,)
 
         # Progress bar for each lindemann index calculation
         self.filebar = Progressbar(
@@ -179,13 +182,15 @@ class Application(tk.Frame):
         self.extension_entry.insert("end", ".lammpstrj")
 
         # Entry for file extension
-        self.prefix_label = Label(self, text="File prefix:", anchor="e", width="10",)
+        self.prefix_label = Label(
+            self, text="File prefix:", anchor="e", width="10",)
         self.prefix_entry = Entry(self)
         # default text value for the prefix is "", hence no need to redefine
 
         # --------Filedialog---------
         # label for current working directory
-        self.cwd_label = Label(self, text="Directory Name:", anchor="e", width="10",)
+        self.cwd_label = Label(
+            self, text="Directory Name:", anchor="e", width="10",)
 
         # entry for current working directory
         self.cwd_entry = Entry(self)
@@ -366,7 +371,8 @@ class Application(tk.Frame):
 
         # Log the current file extension to the GUI
         if file_extension == "":
-            self.log_text.insert(tk.INSERT, "No file extension was selected.\n")
+            self.log_text.insert(
+                tk.INSERT, "No file extension was selected.\n")
         else:
             self.log_text.insert(
                 tk.INSERT, f'Using "{file_extension}" as target file extension.\n'
@@ -396,7 +402,8 @@ class Application(tk.Frame):
         # Sort file naturally based on number in the file
         self.file_list = nt.natsorted(self.file_list)
         # Log the output
-        self.log_text.insert(tk.INSERT, f"Outputting the lists of files to the console")
+        self.log_text.insert(
+            tk.INSERT, f"Outputting the lists of files to the console")
         # insert the file into the scrolled text
         for file in self.file_list:
             self.file_text.insert(tk.INSERT, f"{file}\n")
@@ -440,7 +447,8 @@ class Application(tk.Frame):
             self.num_text.insert(tk.INSERT, f"{number}\n")
 
         # log
-        self.log_text.insert(tk.INSERT, "Extracted the numbers from the file name")
+        self.log_text.insert(
+            tk.INSERT, "Extracted the numbers from the file name")
 
     # -------------------------------------------------------------------------------
     def clear(self):
@@ -633,7 +641,8 @@ class Application(tk.Frame):
                 # Take the time-average
                 distance_average[k:, k] = np.mean(distance, axis=time_axis)
                 # Take the time-average of the squared distance
-                distance_square_average[k:, k] = np.mean(distance ** 2, axis=time_axis)
+                distance_square_average[k:, k] = np.mean(
+                    distance ** 2, axis=time_axis)
                 # For progress bar for each computation
                 self.compute_bar["value"] = (
                     self.compute_bar["value"] + self.bar_value / num_distance
@@ -652,7 +661,8 @@ class Application(tk.Frame):
                 )
             # Since half of the matrix is division by 0, there will be NaN
             # Hence conversion from NaN to 0 is necessary.
-            lindemann_index_individual = np.nan_to_num(lindemann_index_individual[:])
+            lindemann_index_individual = np.nan_to_num(
+                lindemann_index_individual[:])
             # Sum up all the individual lindeman index to obtain lindemann index cluster
             # Store the final value into matrix so we can obtain all at once later
             self.lindemann_index_cluster[count] = coefficient * np.sum(
